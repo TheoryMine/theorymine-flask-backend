@@ -1,0 +1,13 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+
+create index id
+  on tm_relations (id)
+;
+
+"""
+
+SQL_DOWN = u"""
+DROP INDEX id ON tm_relations
+
+"""

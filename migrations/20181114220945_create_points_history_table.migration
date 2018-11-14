@@ -1,0 +1,20 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+create table tm_points_history
+(
+  id int auto_increment NOT NULL PRIMARY KEY,
+  history_id int null,
+  prev_id int null,
+  action_id int null,
+  point_type varchar(255) null,
+  title varchar(255) null,
+  body text null,
+  time_stamp timestamp default CURRENT_TIMESTAMP not null
+)
+;
+"""
+
+SQL_DOWN = u"""
+    DROP TABLE tm_points_history;
+
+"""

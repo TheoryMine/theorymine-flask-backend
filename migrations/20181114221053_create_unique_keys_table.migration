@@ -1,0 +1,14 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+
+create table tm_unique_keys
+(
+  id int auto_increment NOT NULL PRIMARY KEY
+)
+;
+"""
+
+SQL_DOWN = u"""
+    DROP TABLE tm_unique_keys;
+
+"""

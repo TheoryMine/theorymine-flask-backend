@@ -1,0 +1,23 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+create table tm_users
+(
+  id int auto_increment NOT NULL PRIMARY KEY,
+  lastname varchar(255) null,
+  firstname varchar(255) null,
+  email varchar(255) null,
+  password varchar(80) null,
+  userkind varchar(255) null,
+  last_act_time timestamp default CURRENT_TIMESTAMP not null,
+  last_act_kind varchar(255) null,
+  last_act_code varchar(255) null,
+  constraint email
+  unique (email)
+)
+;
+"""
+
+SQL_DOWN = u"""
+    DROP TABLE tm_users;
+
+"""
