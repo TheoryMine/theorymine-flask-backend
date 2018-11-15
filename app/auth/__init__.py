@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify, current_app
-import hashlib
 
 from app.exceptions import BadRequestError
-from app.users.all_users import AllUsers
-from app.users.validations import verify_new_user_request_body
+from app.auth.all_users import AllUsers
+from app.auth.validations import verify_new_user_request_body
 
-bp = Blueprint('users', __name__, url_prefix='/users')
+bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @bp.route('/users', methods=['POST'])
