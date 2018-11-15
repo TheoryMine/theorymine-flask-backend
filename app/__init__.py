@@ -1,7 +1,9 @@
 from flask import Flask
 import logging
 import os
+
 from . import db
+from app import users
 
 
 def create_app(config_name='default'):
@@ -16,6 +18,7 @@ def create_app(config_name='default'):
 
 
     app.config.from_object(configs[config_name])
+    app.register_blueprint(users.bp)
 
     db.init_app(app)
     file_handler = logging.FileHandler('./logs/app.log')
