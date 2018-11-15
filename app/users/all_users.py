@@ -1,6 +1,8 @@
 import uuid
 import hashlib
 from app.db import get_db
+from app.exceptions import BadRequestError
+
 
 class AllUsers:
     def __init__(self, logger):
@@ -10,6 +12,9 @@ class AllUsers:
     def add_one(self, last_name, first_name, email, password, userkind='normal', cursor=None):
         self.logger.info("Adding user")
         transaction = cursor or self.db.cursor()
+        existing_user = self.fetch_one_by_email(email, cursor)
+        if existing_user:
+            raise BadRequestError('User with this email already registered')
         password_to_encode = '{0}.{1}'.format(email, password)
         password = hashlib.md5(password_to_encode.encode()).hexdigest()
         insert_query = "INSERT INTO tm_users(lastname, firstname, email, password, last_act_kind, userkind) " \

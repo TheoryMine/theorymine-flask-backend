@@ -3,6 +3,7 @@ import hashlib
 
 from app.exceptions import BadRequestError
 from app.users.all_users import AllUsers
+from app.users.validations import verify_new_user_request_body
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -15,6 +16,8 @@ def users():
     if request.method == 'POST':
         try:
             request_body = request.get_json()
+            verify_new_user_request_body(request_body, logger)
+
             new_user = all_users.add_one(request_body['last_name'], request_body['first_name'], request_body['email'],
                                          request_body['password'])
             resp = jsonify(new_user)
