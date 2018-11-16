@@ -4,6 +4,7 @@ import os
 
 from . import db
 from app import auth
+from app import registry
 
 
 def create_app(config_name='default'):
@@ -19,6 +20,7 @@ def create_app(config_name='default'):
 
     app.config.from_object(configs[config_name])
     app.register_blueprint(auth.bp)
+    app.register_blueprint(registry.bp)
 
     db.init_app(app)
     file_handler = logging.FileHandler('./logs/app.log')
