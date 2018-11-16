@@ -25,7 +25,10 @@ def test_post_to_users_success(db, client):
     assert api_response.status_code == 201
     assert api_response.content_type == 'application/json'
     user_id = api_response.json['user_id']
+    auth_token=api_response.json['auth_token']
     assert user_id is not None
+    assert auth_token is not None
+
     user_values = get_user_from_db(db, user_id)
     assert len(user_values) == 1
 
