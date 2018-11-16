@@ -4,8 +4,8 @@ from flask.views import MethodView
 from app.auth.all_users import AllUsers
 from app.auth.authorization import auth_token_required
 from app.auth.userTokens import UserToken
-from app.auth.validations import verify_new_user_request_body
-from app.exceptions import BadRequestError
+from app.exceptions import BadRequestError, UnauthorisedError
+
 
 class OrdersApi(MethodView):
 
@@ -15,7 +15,8 @@ class OrdersApi(MethodView):
         self.all_users = AllUsers(self.logger)
         self.user_token = UserToken()
 
-    def post(self):
+    @auth_token_required
+    def post(self, user_id):
         try:
             request_body = request.get_json()
 
@@ -28,6 +29,10 @@ class OrdersApi(MethodView):
             resp = jsonify({'code': 'ERR_BAD_REQUEST', 'message': e.message})
             self.logger.error('ERR_BAD_REQUEST EXCEPTION: ' + str(e))
             return make_response(resp), 400
+        except UnauthorisedError as e:
+            resp = jsonify({'code': 'ERR_UNAUTHORISED_REQUEST', 'message': e.message})
+            self.logger.error('ERR_UNAUTHORISED_REQUEST EXCEPTION: ' + str(e))
+            return make_response(resp), 404
         except Exception as e:
             self.logger.error('UNKNOWN EXCEPTION: ' + str(e))
             resp = jsonify({'code': 'ERR_UNKNOWN', 'message': 'unknown error'})

@@ -54,9 +54,10 @@ def test_unauthorised_bad_token(app, client):
         resp = jsonify({'message': 'this is fake!'})
         resp.status_code = 200
         return resp
+    response = client.get('/fake',  headers={'Authorization':'Bearer random-bad-token' })
+    assert response.status_code == 401
+    assert response.json['message']=="User unauthorised to make this request"
 
-    with pytest.raises(UnauthorisedError, message="User unauthorised to make this request"):
-        client.get('/fake',  headers={'Authorization':'Bearer random-bad-token' })
 
 def test_unauthorised_no_token1(app, client):
     @app.route('/fake')
@@ -65,9 +66,10 @@ def test_unauthorised_no_token1(app, client):
         resp = jsonify({'message': 'this is fake!'})
         resp.status_code = 200
         return resp
+    response = client.get('/fake',  headers={'Authorization': None })
+    assert response.status_code == 401
+    assert response.json['message']=='Please provide an auth token'
 
-    with pytest.raises(UnauthorisedError, message='Please provide an auth token'):
-        client.get('/fake',  headers={'Authorization': None })
 
 def test_unauthorised_no_token2(app, client):
     @app.route('/fake')
@@ -76,9 +78,10 @@ def test_unauthorised_no_token2(app, client):
         resp = jsonify({'message': 'this is fake!'})
         resp.status_code = 200
         return resp
+    response = client.get('/fake',  headers={ })
+    assert response.status_code == 401
+    assert response.json['message']=='Please provide an auth token'
 
-    with pytest.raises(UnauthorisedError, message='Please provide an auth token'):
-        client.get('/fake',  headers={ })
 
 def test_unauthorised_no_expired(app, client):
     @app.route('/fake')
@@ -97,7 +100,9 @@ def test_unauthorised_no_expired(app, client):
     registration_response = client.post('/auth/users', json=new_user)
     auth_token = registration_response.json['auth_token']
     time.sleep(1)
-    with pytest.raises(UnauthorisedError, message='Signature expired. Please log in again'):
-        client.get('/fake',  headers={'Authorization':'Bearer ' + auth_token})
+    response = client.get('/fake',  headers={'Authorization':'Bearer ' + auth_token})
+    assert response.status_code == 401
+    assert response.json['message']=='Signature expired. Please log in again'
+
 
 
