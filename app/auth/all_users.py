@@ -3,9 +3,9 @@ from app.db import get_db
 from app.exceptions import BadRequestError
 
 class AllUsers:
-    def __init__(self, logger):
+    def __init__(self, logger, db = None):
         self.logger = logger
-        self.db = get_db()
+        self.db = db or get_db()
 
     def add_one(self, last_name, first_name, email, password, userkind='normal', cursor=None):
         self.logger.info("Adding user")

@@ -5,6 +5,7 @@ from app.auth.all_users import AllUsers
 from app.auth.authorization import auth_token_required
 from app.auth.userTokens import UserToken
 from app.exceptions import BadRequestError, UnauthorisedError
+from app.registry.all_orders import AllOrders
 
 
 class OrdersApi(MethodView):
@@ -13,13 +14,14 @@ class OrdersApi(MethodView):
 
         self.logger = current_app.logger
         self.all_users = AllUsers(self.logger)
+        self.all_orders = AllOrders(self.logger)
         self.user_token = UserToken()
 
     @auth_token_required
     def post(self, user_id):
         try:
             request_body = request.get_json()
-
+            self.all_orders.add_one('a', 'b')
             theorem_id = '123'
             response_object = {
                 'theorem_id': theorem_id

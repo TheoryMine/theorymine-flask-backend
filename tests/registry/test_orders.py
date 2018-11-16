@@ -1,4 +1,3 @@
-import time
 import uuid
 
 def register_new_user(client):
@@ -12,6 +11,12 @@ def register_new_user(client):
     auth_token = registration_response.json['auth_token']
     return auth_token
 
+def get_unique_key_from_db(db):
+    transaction = db.cursor()
+    select_query = "SELECT id FROM tm_unique_keys "
+    transaction.execute(select_query)
+    results = transaction.fetchone()
+    return results
 
 def test_post_to_orders_success(db, client):
     auth_token = register_new_user(client)
@@ -27,6 +32,9 @@ def test_post_to_orders_success(db, client):
     assert api_response.content_type == 'application/json'
     theorem_id = api_response.json['theorem_id']
     assert theorem_id is not None
+
+    history_id = get_unique_key_from_db(db)
+    assert history_id is not None
 
 
 def test_unauthorised_with_no_token(client):

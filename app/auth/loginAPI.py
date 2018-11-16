@@ -1,7 +1,6 @@
 from flask import request, jsonify, current_app, make_response
 from flask.views import MethodView
 
-from app.auth.authorization import auth_token_required
 from app.auth.userTokens import  UserToken
 from app.exceptions import BadRequestError, NonExistentError
 from app.auth.all_users import AllUsers
@@ -9,11 +8,11 @@ from app.auth.validations import verify_login_request_body
 
 class LoginAPI(MethodView):
 
-    def __init__(self):
+    def __init__(self, logger = None, all_users = None, user_token = None):
 
-        self.logger = current_app.logger
-        self.all_users = AllUsers(self.logger)
-        self.user_token = UserToken()
+        self.logger = logger or current_app.logger
+        self.all_users = all_users or AllUsers(self.logger)
+        self.user_token = user_token or UserToken()
 
     def post(self):
         try:

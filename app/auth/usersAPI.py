@@ -2,18 +2,16 @@ from flask import request, jsonify, current_app, make_response
 from flask.views import MethodView
 
 from app.auth.all_users import AllUsers
-from app.auth.authorization import auth_token_required
 from app.auth.userTokens import UserToken
 from app.auth.validations import verify_new_user_request_body
 from app.exceptions import BadRequestError
 
 class UsersAPI(MethodView):
 
-    def __init__(self):
-
-        self.logger = current_app.logger
-        self.all_users = AllUsers(self.logger)
-        self.user_token = UserToken()
+    def __init__(self, logger=None, all_users=None, user_token=None):
+        self.logger = logger or current_app.logger
+        self.all_users = all_users or AllUsers(self.logger)
+        self.user_token = user_token or UserToken()
 
     def post(self):
         try:

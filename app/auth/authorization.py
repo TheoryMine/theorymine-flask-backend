@@ -10,7 +10,6 @@ def auth_token_required(func):
     def auth_decorator(*args, **kwargs):
         try:
             logger = current_app.logger
-            logger.info(args)
             user_token = UserToken()
             logger.info('Authorising user with basic auth')
             auth_header = request.headers.get('Authorization')
