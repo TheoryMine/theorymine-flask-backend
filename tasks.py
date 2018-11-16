@@ -24,7 +24,15 @@ def start_dev(c):
 
 @task(prepare_test_env, migrate_up)
 def test(c):
-    c.run("python -m pytest tests -s")\
+    c.run("python -m pytest tests -s")
+
+@task(prepare_test_env, migrate_up)
+def test_c(c, file_name):
+    c.run("python -m pytest {} -s".format(file_name))
+
+@task(prepare_test_env, migrate_up)
+def test_f(c, file_name, function_name):
+    c.run("python -m pytest {}::{} -s".format(file_name, function_name))
 
 @task
 def deploy(c):

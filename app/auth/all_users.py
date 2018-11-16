@@ -38,3 +38,18 @@ class AllUsers:
             transaction.close()
         self.logger.info("Done fetching user by email")
         return results
+
+    def fetch_one_by_email_and_password(self, email, password, cursor=None):
+        self.logger.info("Fetching user by email and password")
+        transaction = cursor or self.db.cursor()
+        password_to_encode = '{0}.{1}'.format(email, password)
+
+        password = hashlib.md5(password_to_encode.encode()).hexdigest()
+        query = "SELECT id FROM tm_users WHERE email = %s AND password = %s ;"
+        transaction.execute(query, (email,password))
+        self.logger.info('HERE2')
+        results = transaction.fetchone()
+        if cursor is None:
+            transaction.close()
+        self.logger.info("Done fetching user by email and password")
+        return results
