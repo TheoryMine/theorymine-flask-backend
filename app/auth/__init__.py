@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 
+from app.auth.tokens import encode_auth_token
 from app.exceptions import BadRequestError, NonExistentError
 from app.auth.all_users import AllUsers
 from app.auth.validations import verify_new_user_request_body, verify_login_request_body
@@ -41,10 +42,11 @@ def session():
         try:
             request_body = request.get_json()
             verify_login_request_body(request_body, logger)
-            new_user = all_users.fetch_one_by_email_and_password(request_body['email'],request_body['password'])
-            if not new_user:
+            user_id = all_users.fetch_one_by_email_and_password(request_body['email'],request_body['password'])
+            auth_token = encode_auth_token(user_id)
+            if not user_id:
                 raise NonExistentError('Password and Email do not match')
-            resp = jsonify({})
+            resp = jsonify({'user_id' : user_id, 'auth_token' : auth_token.decode()})
             resp.status_code = 200
             return resp
         except BadRequestError as e:

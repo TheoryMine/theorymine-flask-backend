@@ -1,8 +1,6 @@
-import uuid
 import hashlib
 from app.db import get_db
 from app.exceptions import BadRequestError
-
 
 class AllUsers:
     def __init__(self, logger):

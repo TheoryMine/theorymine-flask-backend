@@ -23,6 +23,7 @@ def test_post_to_users_success(db, client):
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 201
+    assert api_response.content_type == 'application/json'
     user_id = api_response.json['user_id']
     assert user_id is not None
     user_values = get_user_from_db(db, user_id)
@@ -47,6 +48,7 @@ def test_post_to_users_with_missing_data_2(db, client):
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 400
+    assert api_response.content_type == 'application/json'
     all_users = get_all_users_from_db(db)
     assert len(all_users) == 0
 
@@ -59,6 +61,7 @@ def test_post_to_users_with_bad_email(db, client):
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 400
+    assert api_response.content_type == 'application/json'
     all_users = get_all_users_from_db(db)
     assert len(all_users) == 0
 
@@ -78,6 +81,7 @@ def test_post_to_users_with_existing_email(db, client):
     client.post('/auth/users', json=fist_user)
     api_response = client.post('/auth/users', json=second_user)
     assert api_response.status_code == 400
+    assert api_response.content_type == 'application/json'
     all_users = get_all_users_from_db(db)
     assert len(all_users) == 1
 
@@ -90,6 +94,7 @@ def test_post_to_users_with_bad_password1(db, client):
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 400
+    assert api_response.content_type == 'application/json'
     all_users = get_all_users_from_db(db)
     assert len(all_users) == 0
 
@@ -102,6 +107,7 @@ def test_post_to_users_with_bad_password2(db, client):
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 400
+    assert api_response.content_type == 'application/json'
     all_users = get_all_users_from_db(db)
     assert len(all_users) == 0
 
@@ -114,6 +120,7 @@ def test_post_to_users_with_bad_password3(db, client):
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 400
+    assert api_response.content_type == 'application/json'
     all_users = get_all_users_from_db(db)
     assert len(all_users) == 0
 

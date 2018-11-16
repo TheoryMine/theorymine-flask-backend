@@ -6,6 +6,11 @@ def test_login_success(client):
     client.post('/auth/users', json={ 'first_name': 'Brenda', 'last_name': 'Chan', **new_user_auth })
     api_response = client.post('/auth/session', json=new_user_auth)
     assert api_response.status_code == 200
+    assert api_response.content_type == 'application/json'
+    user_id = api_response.json['user_id']
+    auth_token=api_response.json['auth_token']
+    assert user_id is not None
+    assert auth_token is not None
 
 def test_login_with_non_matching_email_and_password(client):
     new_user_auth = {
