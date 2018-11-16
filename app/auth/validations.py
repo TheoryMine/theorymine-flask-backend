@@ -16,3 +16,10 @@ def verify_new_user_request_body(json, logger):
         raise BadRequestError('Password needs to have at least a number in it')
     elif re.search('[a-zA-Z]',json['password']) is None:
         raise BadRequestError('Password needs to have at least a letter in it')
+
+def verify_login_request_body(json, logger):
+    logger.info('Verifying login body')
+    if not json:
+        raise BadRequestError('This api call requires a body')
+    if not all(k in json.keys() for k in ['email', 'password']):
+        raise BadRequestError('email and password should both be provided')

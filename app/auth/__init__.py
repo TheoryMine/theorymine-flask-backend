@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 
 from app.exceptions import BadRequestError, NonExistentError
 from app.auth.all_users import AllUsers
-from app.auth.validations import verify_new_user_request_body
+from app.auth.validations import verify_new_user_request_body, verify_login_request_body
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -40,6 +40,7 @@ def session():
     if request.method == 'POST':
         try:
             request_body = request.get_json()
+            verify_login_request_body(request_body, logger)
             new_user = all_users.fetch_one_by_email_and_password(request_body['email'],request_body['password'])
             if not new_user:
                 raise NonExistentError('Password and Email do not match')

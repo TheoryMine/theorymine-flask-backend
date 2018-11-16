@@ -47,7 +47,6 @@ class AllUsers:
         password = hashlib.md5(password_to_encode.encode()).hexdigest()
         query = "SELECT id FROM tm_users WHERE email = %s AND password = %s ;"
         transaction.execute(query, (email,password))
-        self.logger.info('HERE2')
         results = transaction.fetchone()
         if cursor is None:
             transaction.close()
