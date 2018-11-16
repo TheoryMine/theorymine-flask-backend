@@ -1,6 +1,8 @@
+import uuid
+
 def test_login_success(client):
     new_user_auth = {
-        'email': 'brenda@example.com',
+        'email': 'brenda+{}@example.com'.format(str(uuid.uuid4())),
         'password': 'helloBrenda1!'
     }
     client.post('/auth/users', json={ 'first_name': 'Brenda', 'last_name': 'Chan', **new_user_auth })
@@ -14,11 +16,11 @@ def test_login_success(client):
 
 def test_login_with_non_matching_email_and_password(client):
     new_user_auth = {
-        'email': 'brenda@example.com',
+        'email': 'brenda+{}@example.com'.format(str(uuid.uuid4())),
         'password': 'helloBrenda1!'
     }
     client.post('/auth/users', json={ 'first_name': 'Brenda', 'last_name': 'Chan', **new_user_auth })
-    api_response = client.post('/auth/session', json={ **new_user_auth, 'password':'mammamia@example.com', })
+    api_response = client.post('/auth/session', json={ **new_user_auth, 'password':'mammamiamia', })
     assert api_response.status_code == 401
 
 def test_login_with_missing_password(client):

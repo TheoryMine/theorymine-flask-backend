@@ -2,27 +2,35 @@ import jwt
 import datetime
 from flask import current_app
 
+from app.auth.all_users import AllUsers
+from app.exceptions import UnauthorisedError
+
+
 class UserToken:
 
-    @staticmethod
-    def encode_auth_token(user_id):
+    def __init__(self):
+        self.secret_key = current_app.config.get('SECRET_KEY')
+        self.logger = current_app.logger
+        self.all_users = AllUsers(self.logger)
+
+    def encode_auth_token(self, user_id):
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
+            'exp': datetime.datetime.utcnow() + current_app.config.get('SESSION_LENGTH'),
             'iat': datetime.datetime.utcnow(),
             'sub': user_id
         }
         return jwt.encode(
             payload,
-            current_app.config.get('SECRET_KEY'),
+            self.secret_key ,
             algorithm='HS256'
         )
 
-    @staticmethod
-    def decode_auth_token(auth_token):
+    def decode_auth_token(self, auth_token):
         try:
-            payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
-            return payload['sub']
+            decoded_token = jwt.decode(auth_token, self.secret_key )
+            user_id = decoded_token['sub']
+            return user_id
         except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again.'
+            raise UnauthorisedError('Signature expired. Please log in again')
         except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again.'
+            raise UnauthorisedError('User unauthorised to make this request')

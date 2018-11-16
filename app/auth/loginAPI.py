@@ -1,5 +1,7 @@
 from flask import request, jsonify, current_app, make_response
 from flask.views import MethodView
+
+from app.auth.authorization import auth_token_required
 from app.auth.userTokens import  UserToken
 from app.exceptions import BadRequestError, NonExistentError
 from app.auth.all_users import AllUsers

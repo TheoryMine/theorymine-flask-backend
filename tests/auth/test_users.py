@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 
 def get_user_from_db(db, user_id):
     transaction = db.cursor()
@@ -15,11 +16,13 @@ def get_all_users_from_db(db):
     return results
 
 def test_post_to_users_success(db, client):
+    email = 'brenda+{}@example.com'.format(str(uuid.uuid4()))
+    password = 'helloBrenda1!'
     new_user = {
         'first_name': 'Brenda',
         'last_name': 'Chan',
-        'email': 'brenda@example.com',
-        'password': 'helloBrenda1!'
+        'email': email,
+        'password': password
     }
     api_response = client.post('/auth/users', json=new_user)
     assert api_response.status_code == 201
@@ -35,7 +38,7 @@ def test_post_to_users_success(db, client):
     assert user_values[0]['firstname'] == new_user['first_name']
     assert user_values[0]['lastname'] == new_user['last_name']
     assert user_values[0]['email'] == new_user['email']
-    assert user_values[0]['password'] == hashlib.md5(b'brenda@example.com.helloBrenda1!').hexdigest()
+    assert user_values[0]['password'] == hashlib.md5('{}.{}'.format(email, password).encode()).hexdigest()
 
 def test_post_to_users_with_missing_data_1(db, client):
     api_response = client.post('/auth/users')
@@ -46,7 +49,7 @@ def test_post_to_users_with_missing_data_1(db, client):
 def test_post_to_users_with_missing_data_2(db, client):
     new_user = {
         'first_name': 'Brenda',
-        'email': 'brenda@example.com',
+        'email': 'brenda+{}@example.com'.format(str(uuid.uuid4())),
         'password': 'helloBrenda1!'
     }
     api_response = client.post('/auth/users', json=new_user)
@@ -69,16 +72,17 @@ def test_post_to_users_with_bad_email(db, client):
     assert len(all_users) == 0
 
 def test_post_to_users_with_existing_email(db, client):
+    email = 'brenda+{}@example.com'.format(str(uuid.uuid4()))
     fist_user = {
         'first_name': 'Brenda',
         'last_name': 'Chan',
-        'email': 'brenda@example.com',
+        'email': email,
         'password': 'helloBrenda1!'
     }
     second_user = {
         'first_name': 'Hello',
         'last_name': 'Moto',
-        'email': 'brenda@example.com',
+        'email': email,
         'password': 'helloMoto1!'
     }
     client.post('/auth/users', json=fist_user)
@@ -92,7 +96,7 @@ def test_post_to_users_with_bad_password1(db, client):
     new_user = {
         'first_name': 'Brenda',
         'last_name': 'Chan',
-        'email': 'brenda@example.com',
+        'email': 'brenda+{}@example.com'.format(str(uuid.uuid4())),
         'password': 'a1'
     }
     api_response = client.post('/auth/users', json=new_user)
@@ -105,7 +109,7 @@ def test_post_to_users_with_bad_password2(db, client):
     new_user = {
         'first_name': 'Brenda',
         'last_name': 'Chan',
-        'email': 'brenda@example.com',
+        'email': 'brenda+{}@example.com'.format(str(uuid.uuid4())),
         'password': 'abcdefghi'
     }
     api_response = client.post('/auth/users', json=new_user)
@@ -118,7 +122,7 @@ def test_post_to_users_with_bad_password3(db, client):
     new_user = {
         'first_name': 'Brenda',
         'last_name': 'Chan',
-        'email': 'brenda@example.com',
+        'email': 'brenda+{}@example.com'.format(str(uuid.uuid4())),
         'password': '12345678'
     }
     api_response = client.post('/auth/users', json=new_user)
