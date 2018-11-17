@@ -9,3 +9,7 @@ class NonExistentError(Exception):
 class UnauthorisedError(Exception):
     def __init__(self, message ="User unauthorised to make this request"):
         self.message = message
+
+class StripeCardError(Exception):
+    def __init__(self, message ="Charge to card went wrong"):
+        self.message = message

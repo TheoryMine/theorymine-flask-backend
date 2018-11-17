@@ -7,6 +7,8 @@ def prepare_test_env(c):
     os.environ['DATABASE_USER']='root'
     os.environ['DATABASE_PASSWORD']=''
     os.environ['DATABASE_NAME']='theorymine-test'
+    os.environ['STRIPE_SECRET_KEY']='fake-stripe-key'
+    os.environ['STRIPE_PUBLISHABLE_KEY']='fake-stripe-key'
 
 
 @task
@@ -19,7 +21,7 @@ def create_migration(c, name):
 
 @task()
 def start_dev(c):
-    c.run("export FLASK_APP=app")
+    os.environ['FLASK_APP']='app'
     c.run("FLASK_ENV=development flask run")
 
 @task(prepare_test_env, migrate_up)

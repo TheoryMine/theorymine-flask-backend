@@ -2,9 +2,10 @@ from flask import Flask
 import logging
 import os
 
+from app.registry import RegistryResource
 from . import db
+from . import get_stripe
 from app import auth
-from app import registry
 
 
 def create_app(config_name='default'):
@@ -17,14 +18,18 @@ def create_app(config_name='default'):
         "production": "app.config.BaseConfig"
     }
 
-
     app.config.from_object(configs[config_name])
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(registry.bp)
 
+    get_stripe.init_app(app)
     db.init_app(app)
     file_handler = logging.FileHandler('./logs/app.log')
     app.logger.addHandler(file_handler)
+
+    registry_resource = RegistryResource()
+
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(registry_resource.bp)
+
     return app
 
 app = create_app()
