@@ -181,7 +181,6 @@ def test_get_to_orders_success(db, client):
     assert new_order3['theorem_name'] in processed_names
 
 
-
 def test_get_unauthorised_with_no_token(client):
     api_response = client.get('/registry/orders')
     assert api_response.status_code == 401

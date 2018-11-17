@@ -36,7 +36,7 @@ class AllOrders:
     def fetch_all_for_user_and_type(self, user_id, type, cursor=None):
         self.logger.info("Fetching orders by user id and type. User id: {},. Type: {}".format(user_id, type))
         transaction = cursor or self.db.cursor()
-        query = "SELECT p.point_type, p.time_stamp, p.title, a.time_stamp FROM tm_points as p, tm_actions as a " \
+        query = "SELECT p.id, p.point_type, p.time_stamp, p.title, a.time_stamp as a_time_stamp FROM tm_points as p, tm_actions as a " \
                 "WHERE a.user_id = %s AND a.history_id = p.history_id " \
                 "AND a.action_type = 'create_point' " \
                 "AND point_type LIKE %s " \
