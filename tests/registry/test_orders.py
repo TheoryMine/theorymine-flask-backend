@@ -40,6 +40,7 @@ def get_point_from_db(db, point_id):
     results = transaction.fetchall()
     return results
 
+################### POST
 def test_post_to_orders_success(stripe, db, client):
     user = register_new_user(client)
     auth_token = user['auth_token']
@@ -92,14 +93,13 @@ def test_post_to_orders_success(stripe, db, client):
     assert (action[0]['obj_id']) == point_h_id
 
 
-
-def test_unauthorised_with_no_token(client):
+def test_post_unauthorised_with_no_token(client):
     body = {'theorem_name': 'Brenda Theorem','payment_token': '123'}
     api_response = client.post('/registry/orders', json=body)
     assert api_response.status_code == 401
 
 
-def test_unauthorised_with_expired_token(client):
+def test_post_unauthorised_with_expired_token(client):
     user = register_new_user(client)
     auth_token = user['auth_token']
 
@@ -136,3 +136,35 @@ def test_post_to_orders_missing_payment_token(client):
                                headers={'Authorization': 'Bearer ' + auth_token})
 
     assert api_response.status_code == 400
+
+############## GET
+
+
+def test_get_to_orders_success(db, client):
+    user = register_new_user(client)
+    auth_token = user['auth_token']
+    user_id = user['user_id']
+
+    new_order1 = {'theorem_name': 'Brenda Theorem',}
+    new_order2 = {'theorem_name': 'Patato Theorem',}
+    payment_token ='123'
+    client.post('/registry/orders',json={'payment_token': payment_token, **new_order1},headers={'Authorization': 'Bearer ' + auth_token})
+    client.post('/registry/orders',json={'payment_token': payment_token, **new_order2},headers={'Authorization': 'Bearer ' + auth_token})
+
+    api_response = client.get('/registry/orders', headers={'Authorization': 'Bearer ' + auth_token})
+    assert api_response.status_code == 200
+
+def test_get_unauthorised_with_no_token(client):
+    api_response = client.get('/registry/orders')
+    assert api_response.status_code == 401
+
+
+def test_get_unauthorised_with_expired_token(client):
+    user = register_new_user(client)
+    auth_token = user['auth_token']
+
+    time.sleep(1)
+    api_response = client.get('/registry/orders',
+                               headers={'Authorization': 'Bearer ' + auth_token})
+    assert api_response.status_code == 401
+

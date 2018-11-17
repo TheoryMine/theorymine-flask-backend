@@ -29,6 +29,7 @@ class OrdersApi(MethodView):
             payment_token = request_body['payment_token']
             theorem_id = self.all_orders.add_one(user_id, order_name = theorem_name)
             self.stripe_payments.charge_customer(payment_token = payment_token, theorem_name = theorem_name)
+            # TODO: handle commit to db here
             response_object = {'theorem_id': theorem_id}
             return make_response(jsonify(response_object)), 201
         except BadRequestError as e:
@@ -43,6 +44,22 @@ class OrdersApi(MethodView):
             resp = jsonify({'code': 'ERR_PAYMENT', 'message': e.message})
             self.logger.error('ERR_PAYMENT EXCEPTION: ' + str(e))
             return make_response(resp), 500
+        except Exception as e:
+            self.logger.error('UNKNOWN EXCEPTION: ' + str(e))
+            resp = jsonify({'code': 'ERR_UNKNOWN', 'message': 'unknown error'})
+            return make_response(resp), 500
+
+
+    @auth_token_required
+    def get(self, user_id):
+        try:
+            request_body = request.get_json()
+            response_object = {}
+            return make_response(jsonify(response_object)), 200
+        except UnauthorisedError as e:
+            resp = jsonify({'code': 'ERR_UNAUTHORISED_REQUEST', 'message': e.message})
+            self.logger.error('ERR_UNAUTHORISED_REQUEST EXCEPTION: ' + str(e))
+            return make_response(resp), 404
         except Exception as e:
             self.logger.error('UNKNOWN EXCEPTION: ' + str(e))
             resp = jsonify({'code': 'ERR_UNKNOWN', 'message': 'unknown error'})

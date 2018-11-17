@@ -11,5 +11,5 @@ class RegistryResource:
         self.bp.add_url_rule(
             '/orders',
             view_func=orders_view,
-            methods=['POST']
+            methods=['POST', 'GET']
         )
