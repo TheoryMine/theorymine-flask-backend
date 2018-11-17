@@ -21,8 +21,8 @@ class OrdersApi(MethodView):
     def post(self, user_id):
         try:
             request_body = request.get_json()
-            self.all_orders.add_one('a', 'b')
-            theorem_id = '123'
+            theorem_name = request_body['theorem_name']
+            theorem_id = self.all_orders.add_one(user_id, order_name = theorem_name)
             response_object = {
                 'theorem_id': theorem_id
             }

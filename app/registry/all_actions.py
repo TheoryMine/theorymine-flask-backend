@@ -1,52 +1,35 @@
-import hashlib
+import datetime
 from app.db import get_db
-from app.exceptions import BadRequestError
+from flask import current_app
 
-class AllUsers:
-    def __init__(self, logger):
-        self.logger = logger
-        self.db = get_db()
+class AllActions:
+    def __init__(self, logger = None, db=None,):
+        self.logger = logger or current_app.logger
+        self.db = db or get_db()
 
-    def add_one(self, last_name, first_name, email, password, userkind='normal', cursor=None):
-        self.logger.info("Adding user")
+    def add_one(self, user_id, history_id, act_body='', cursor=None):
+        self.logger.info("Adding action ")
         transaction = cursor or self.db.cursor()
-        existing_user = self.fetch_one_by_email(email, cursor)
-        if existing_user:
-            raise BadRequestError('User with this email already registered')
-        password_to_encode = '{0}.{1}'.format(email, password)
-        password = hashlib.md5(password_to_encode.encode()).hexdigest()
-        insert_query = "INSERT INTO tm_users(lastname, firstname, email, password, last_act_kind, userkind) " \
-                       "VALUES (%s, %s, %s, %s, %s, %s)"
-        transaction.execute(insert_query, (last_name, first_name, email, password, 'new_user', userkind))
-        new_user = self.fetch_one_by_email(email, cursor)
+        insert_query = "INSERT INTO tm_actions " \
+                       "(obj_id, action_type, action_body, user_id, ipaddr, time_stamp, history_id) " \
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        transaction.execute(insert_query,
+                            (0, 'create_point', act_body, user_id, user_id, datetime.datetime.utcnow(), history_id))
+        action_id = transaction.lastrowid
         if cursor is None:
             self.db.commit()
             transaction.close()
-        self.logger.info("Done adding user")
-        return {'user_id': new_user['id']}
+        self.logger.info("Done adding action: " + str(action_id))
+        return action_id
 
-    def fetch_one_by_email(self, email, cursor=None):
-        self.logger.info("Fetching user by email")
+    def update_one_obj_id(self, new_obj_id, action_id, cursor=None):
+        self.logger.info("Updating action object id to : {}. Action id: ".format(str(new_obj_id), str(action_id)))
         transaction = cursor or self.db.cursor()
-        query = "SELECT id, lastname, firstname, email, password, userkind, last_act_kind, last_act_time, last_act_code " \
-                "FROM tm_users WHERE email = %s;"
-        transaction.execute(query, (email,))
-        results = transaction.fetchone()
+        update_query = "UPDATE tm_actions SET obj_id=%s WHERE id=%s"
+        transaction.execute(update_query,
+                            (new_obj_id, action_id,))
         if cursor is None:
+            self.db.commit()
             transaction.close()
-        self.logger.info("Done fetching user by email")
-        return results
-
-    def fetch_one_by_email_and_password(self, email, password, cursor=None):
-        self.logger.info("Fetching user by email and password")
-        transaction = cursor or self.db.cursor()
-        password_to_encode = '{0}.{1}'.format(email, password)
-
-        password = hashlib.md5(password_to_encode.encode()).hexdigest()
-        query = "SELECT id FROM tm_users WHERE email = %s AND password = %s ;"
-        transaction.execute(query, (email,password))
-        results = transaction.fetchone()
-        if cursor is None:
-            transaction.close()
-        self.logger.info("Done fetching user by email and password")
-        return results
+        self.logger.info(" Done updating action object id to : {}. Action id: ".format(str(new_obj_id), str(action_id)))
+        return
