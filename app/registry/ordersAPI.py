@@ -6,6 +6,7 @@ from app.auth.authorization import auth_token_required
 from app.auth.userTokens import UserToken
 from app.exceptions import BadRequestError, UnauthorisedError
 from app.registry.all_orders import AllOrders
+from app.registry.validations import verify_orders_request_body
 
 
 class OrdersApi(MethodView):
@@ -21,6 +22,7 @@ class OrdersApi(MethodView):
     def post(self, user_id):
         try:
             request_body = request.get_json()
+            verify_orders_request_body(request_body, self.logger)
             theorem_name = request_body['theorem_name']
             theorem_id = self.all_orders.add_one(user_id, order_name = theorem_name)
             response_object = {

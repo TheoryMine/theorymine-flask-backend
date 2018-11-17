@@ -99,7 +99,9 @@ def test_unauthorised_with_no_token(client):
 
 
 def test_unauthorised_with_expired_token(client):
-    auth_token = register_new_user(client)
+    user = register_new_user(client)
+    auth_token = user['auth_token']
+
     time.sleep(1)
 
     new_order = {'theorem_name': 'Brenda Theorem', }
@@ -107,3 +109,17 @@ def test_unauthorised_with_expired_token(client):
                                json=new_order,
                                headers={'Authorization': 'Bearer ' + auth_token})
     assert api_response.status_code == 401
+
+
+def test_post_to_orders_missing_theorem_name(client):
+    user = register_new_user(client)
+    auth_token = user['auth_token']
+
+    new_order = {
+        'theorem_name': None,
+    }
+    api_response = client.post('/registry/orders',
+                               json=new_order,
+                               headers={'Authorization': 'Bearer ' + auth_token})
+
+    assert api_response.status_code == 400
