@@ -13,9 +13,9 @@ class StripePayments():
     def charge_customer(self, payment_token, theorem_name):
         try:
             self.logger.info('Charging customer from theorem: ' + theorem_name)
-            charge = self.stripe.Charge.create(
+            charge = self.stripe.create(
                 source=payment_token,
-                amount=150,
+                amount=1500,
                 currency='gbp',
                 description=theorem_name
             )
