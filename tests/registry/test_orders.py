@@ -40,6 +40,11 @@ def get_point_from_db(db, point_id):
     results = transaction.fetchall()
     return results
 
+def change_order_type(db, point_id, new_type):
+    transaction = db.cursor()
+    select_query = "UPDATE tm_points SET point_type = %s  WHERE id = %s "
+    transaction.execute(select_query, (new_type, point_id))
+
 ################### POST
 def test_post_to_orders_success(stripe, db, client):
     user = register_new_user(client)
@@ -142,17 +147,40 @@ def test_post_to_orders_missing_payment_token(client):
 
 def test_get_to_orders_success(db, client):
     user = register_new_user(client)
+    user2 = register_new_user(client)
     auth_token = user['auth_token']
-    user_id = user['user_id']
+    auth_token2 = user2['auth_token']
 
     new_order1 = {'theorem_name': 'Brenda Theorem',}
     new_order2 = {'theorem_name': 'Patato Theorem',}
+    new_order3 = {'theorem_name': 'Hello Moto',}
+    new_order4 = {'theorem_name': 'Other User Theorem',}
     payment_token ='123'
     client.post('/registry/orders',json={'payment_token': payment_token, **new_order1},headers={'Authorization': 'Bearer ' + auth_token})
     client.post('/registry/orders',json={'payment_token': payment_token, **new_order2},headers={'Authorization': 'Bearer ' + auth_token})
+    order_to_process = client.post('/registry/orders',json={'payment_token': payment_token, **new_order3},headers={'Authorization': 'Bearer ' + auth_token})
+    client.post('/registry/orders',json={'payment_token': payment_token, **new_order4},headers={'Authorization': 'Bearer ' + auth_token2})
+
+    order_to_process_id = order_to_process.json['theorem_id']
+    change_order_type(db, order_to_process_id, 'order.hasthm.')
 
     api_response = client.get('/registry/orders', headers={'Authorization': 'Bearer ' + auth_token})
     assert api_response.status_code == 200
+
+    in_progress_theorems = api_response.json['in_progress']
+    assert in_progress_theorems is not None
+    assert len(in_progress_theorems) == 2
+    in_progress_names = list(map(lambda t: t['title'], in_progress_theorems))
+    assert new_order1['theorem_name'] in in_progress_names
+    assert new_order2['theorem_name'] in in_progress_names
+
+    processed_theorems = api_response.json['processed']
+    assert processed_theorems is not None
+    assert len(processed_theorems) == 1
+    processed_names = list(map(lambda t: t['title'], processed_theorems))
+    assert new_order3['theorem_name'] in processed_names
+
+
 
 def test_get_unauthorised_with_no_token(client):
     api_response = client.get('/registry/orders')

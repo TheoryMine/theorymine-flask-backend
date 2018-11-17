@@ -44,6 +44,6 @@ class TestingConfig(BaseConfig):
     BASIC_AUTH_USERNAME = os.getenv("BASIC_AUTH_USERNAME")
     BASIC_AUTH_PASSWORD  =  os.getenv("BASIC_AUTH_PASSWORD")
     SECRET_KEY = os.getenv('SECRET_KEY') or "\xe4z\xedW\x95\xfa^RX\x87\xc3\xcd$\x9e\xc5\x86\x9a\x0f\x8f\x8a]\xa9*\x8a"
-    SESSION_LENGTH = datetime.timedelta(days=0, microseconds=500)
+    SESSION_LENGTH = datetime.timedelta(days=0, seconds =1)
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
     STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']

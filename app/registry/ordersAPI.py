@@ -1,7 +1,6 @@
 from flask import request, jsonify, current_app, make_response
 from flask.views import MethodView
 
-from app.auth.all_users import AllUsers
 from app.auth.authorization import auth_token_required
 from app.auth.userTokens import UserToken
 from app.exceptions import BadRequestError, UnauthorisedError, StripeCardError
@@ -15,7 +14,6 @@ class OrdersApi(MethodView):
     def __init__(self):
 
         self.logger = current_app.logger
-        self.all_users = AllUsers(self.logger)
         self.all_orders = AllOrders(self.logger)
         self.user_token = UserToken()
         self.stripe_payments = StripePayments()
@@ -53,8 +51,9 @@ class OrdersApi(MethodView):
     @auth_token_required
     def get(self, user_id):
         try:
-            request_body = request.get_json()
-            response_object = {}
+            in_progress = self.all_orders.fetch_all_for_user_and_type(user_id, 'order.new.')
+            processed = self.all_orders.fetch_all_for_user_and_type(user_id, 'order.hasthm.')
+            response_object = {'in_progress': in_progress, 'processed': processed}
             return make_response(jsonify(response_object)), 200
         except UnauthorisedError as e:
             resp = jsonify({'code': 'ERR_UNAUTHORISED_REQUEST', 'message': e.message})
