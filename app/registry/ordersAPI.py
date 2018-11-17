@@ -52,7 +52,7 @@ class OrdersApi(MethodView):
     def get(self, user_id):
         try:
             in_progress = self.all_orders.fetch_all_for_user_and_type(user_id, 'order.new.')
-            processed = self.all_orders.fetch_all_for_user_and_type(user_id, 'order.hasthm.')
+            processed = self.all_orders.fetch_all_for_user_and_type_with_relations(user_id, 'order.hasthm.')
             response_object = {'in_progress': in_progress, 'processed': processed}
             return make_response(jsonify(response_object)), 200
         except UnauthorisedError as e:

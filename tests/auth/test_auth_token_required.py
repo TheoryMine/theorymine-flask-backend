@@ -99,7 +99,7 @@ def test_unauthorised_no_expired(app, client):
     }
     registration_response = client.post('/auth/users', json=new_user)
     auth_token = registration_response.json['auth_token']
-    time.sleep(1)
+    time.sleep(2)
     response = client.get('/fake',  headers={'Authorization':'Bearer ' + auth_token})
     assert response.status_code == 401
     assert response.json['message']=='Signature expired. Please log in again'

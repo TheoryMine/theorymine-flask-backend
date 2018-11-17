@@ -108,7 +108,7 @@ def test_post_unauthorised_with_expired_token(client):
     user = register_new_user(client)
     auth_token = user['auth_token']
 
-    time.sleep(1)
+    time.sleep(2)
 
     body = {'theorem_name': 'Brenda Theorem','payment_token': '123'}
     api_response = client.post('/registry/orders',
@@ -190,7 +190,7 @@ def test_get_unauthorised_with_expired_token(client):
     user = register_new_user(client)
     auth_token = user['auth_token']
 
-    time.sleep(1)
+    time.sleep(2)
     api_response = client.get('/registry/orders',
                                headers={'Authorization': 'Bearer ' + auth_token})
     assert api_response.status_code == 401
