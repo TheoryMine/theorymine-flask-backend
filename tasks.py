@@ -3,10 +3,10 @@ import os
 
 @task
 def prepare_test_env(c):
-    os.environ['DATABASE_HOST']='localhost'
-    os.environ['DATABASE_USER']='root'
-    os.environ['DATABASE_PASSWORD']=''
-    os.environ['DATABASE_NAME']='theorymine-test'
+    os.environ['DATABASE_HOST']=os.getenv("DATABASE_HOST") or 'localhost'
+    os.environ['DATABASE_USER']=os.getenv("DATABASE_USER") or 'root'
+    os.environ['DATABASE_PASSWORD']=os.getenv("DATABASE_PASSWORD") or ''
+    os.environ['DATABASE_NAME']=os.getenv("DATABASE_NAME") or'theorymine-test'
     os.environ['STRIPE_SECRET_KEY']='fake-stripe-key'
     os.environ['STRIPE_PUBLISHABLE_KEY']='fake-stripe-key'
 
