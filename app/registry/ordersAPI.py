@@ -7,6 +7,7 @@ from app.exceptions import BadRequestError, UnauthorisedError, StripeCardError
 from app.registry.StripePayments import StripePayments
 from app.registry.all_orders import AllOrders
 from app.registry.validations import verify_orders_request_body
+from app.db import get_db
 
 
 class OrdersApi(MethodView):
@@ -25,8 +26,12 @@ class OrdersApi(MethodView):
             verify_orders_request_body(request_body, self.logger)
             theorem_name = request_body['theorem_name']
             payment_token = request_body['payment_token']
-            theorem_id = self.all_orders.add_one(user_id, order_name = theorem_name)
+            db = get_db()
+            cursor = db.cursor()
+            theorem_id = self.all_orders.add_one(user_id, order_name = theorem_name, cursor= cursor)
             self.stripe_payments.charge_customer(payment_token = payment_token, theorem_name = theorem_name)
+            db.commit()
+            cursor.close()
             # TODO: handle commit to db here
             response_object = {'theorem_id': theorem_id}
             return make_response(jsonify(response_object)), 201

@@ -4,7 +4,6 @@ from flask import g,current_app
 
 
 def get_stripe():
-    current_app.logger.info(current_app.config['ENV'])
     if 'stripe' not in g:
         if current_app.config['ENV'] == 'test':
             stripe_charge_client = FakeStripe()
