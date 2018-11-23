@@ -8,7 +8,7 @@ to migrate up:
 
 mysql database.
 set env variables: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME
-then run: 
+then run:
 inv migrate-up
 
 to run:
@@ -16,11 +16,11 @@ to run:
 set env valiables : DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
 
 
-then run: 
+then run:
 inv start-dev
 
 
-to test: 
+to test:
 
 set env variables: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME
 then run:
